@@ -14,7 +14,7 @@ export const productController = {
           .json({ success: false, message: "No se encontraron productos en BD" });
   },
   async getById(req, res) {
-    let productId = req.params.id;;
+    let productId = req.params.id;
 
     try {
       let r = await Product.findById(productId);
@@ -30,6 +30,30 @@ export const productController = {
       }
 
   },
+  async getByName(req, res) {
+    
+    try {
+      // Obtener parámetros de consulta
+      const { name, brand } = req.query;
+  
+      // Construir el filtro de búsqueda
+      let filter = {};
+      if (name) filter.name = name;
+      if (brand) filter.brand = brand;
+  
+      // Consultar usuarios en la base de datos
+      const products = await Product.find(filter);
+  
+      // Enviar respuesta
+      res.json(products);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+    
+
+
+
+  },
   async uptadeProduct(req, res) {
     let productId = req.params.id;
     let update = req.body;
@@ -37,10 +61,10 @@ export const productController = {
     try {
       let r = await Product.findByIdAndUpdate(productId, update);
       if (r == null){
-        res.status(404).send({message: 'No se ha encontrado un producto con ese id.'})
+        res.status(404).send({status:true, message: 'No se ha encontrado un producto con ese id.'})
 
       } else {
-        res.status(200).send({message: 'El producto ha sido actualizado.'})
+        res.status(200).send({status:true, message: 'El producto ha sido actualizado.', data:r})
       }
 
     } catch (err) {
@@ -84,15 +108,13 @@ export const productController = {
     try {
       let r = await Product.findByIdAndDelete(productId);
       if (r == null){
-        res.status(404).send({message: 'No se ha encontrado un producto con ese id.'})
+        res.status(404).send({status:true, message: 'No se ha encontrado un producto con ese id.'})
 
       } else {
-        res.status(200).send({message: 'El producto ha sido eliminado.'})
+        res.status(200).send({status:true, message: 'El producto ha sido eliminado.'})
 
       }
-      
     
-
       
     } catch (err) {
       res.status(308).json({ success: false, message: err.message });
